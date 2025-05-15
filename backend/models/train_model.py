@@ -9,8 +9,8 @@ from sklearn.metrics import accuracy_socre,precision_recall_fscore_support
 class SentimentDataset(Dataset):
     def __init__(self,texts,labels,tokeinzer,max_length):
         self.texts=texts
-        self.label=label
-        self.tokenizer=tokenizer
+        self.labels=labels
+        self.tokeinzer=tokeinzer
         self.max_length=max_length
 
     def __len__(self):
@@ -33,3 +33,39 @@ class SentimentDataset(Dataset):
             'attention_mask':encoding['attention_mask'].flatten()
             'label':torch.tensor(label,dtype=torch.long)
             }
+
+class BERTModelTrainer:
+    def __init__ (self):
+        self.device=torch.device("cuda" if torch.cuda.is_available()else"cpu")
+        self.tokenizer=BertTokenizer.from_pretrained('bert-base-uncased')
+        self.label_map={'negative':0,'neutral':1,'positive':2}
+        self.reverse_label_map={v:k for k,v in self.label_map.items()}
+
+
+    def load_data(self.filepath:str):
+        df=pd.read_csv(filepath)
+        df['cleaned_text']=df['text'].apply(self.preprocess_text)
+        df['label']=df['sentiment'].map(self.label_map)
+        return df
+    
+    def preprocess_text(self,text:str)->str:
+        return text.lower().strip()
+
+    def compute_metrics(self,pred):
+        labels=pred.label_ids
+        preds-pred.predicitions.argmax(-1)
+        precision,recall,f1,_= precision_recall_fscore_support(labels,preds,average='weighted')
+        acc=accuracy_score(labels,preds)
+        return{
+            'accuracy':acc,
+            'f1':f1,
+            'precision':precision,
+            'recall':recall
+        }
+    def train(self,train_df,eval_df):
+        train_datasets=SentimentDataset(
+            train_df['cleaned_text'].tolist(),
+            train_df['label'].tolist(),
+            sdelf.tokenizer,
+            max_lenght=128
+        )

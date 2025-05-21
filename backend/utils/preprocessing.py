@@ -1,7 +1,7 @@
 import re 
 import nltk
 from nltk.corpus import stopwords
-from nltk.stem import WOrdNetLemmatizer
+from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 
 
@@ -40,5 +40,5 @@ class TextPreprocessor:
         tokens=[self.lemmatizer.lemmatize(word)for word in tokens if word not in self.stop_words]
         return ' '.join(tokens)
     
-    
+
 

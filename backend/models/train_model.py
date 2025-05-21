@@ -95,3 +95,27 @@ class BERTModelTrainer:
             save_strategy="epoch",
             load_best_model_at_end=True
         )
+
+
+        # Initialize Trainer
+
+        Trainer=Trainer(
+            model=model,
+            args=training_args,
+            train_dataset=train_dataset,
+            eval_dataset=eval_dataset,
+            compute_metrics=self.compute_metrics
+        )
+
+        # Train the model
+        trainer.train()
+        return model
+    def save_model(self,model,tokenizer,outpuy_dir):
+        model.save_pretrained(output_dir)
+        tokenizer.save_pretrained(output_dir)
+
+    def train_and_save(self,data_path,output_dir="bert_sentiment_model"):
+        df=self.load_data(data_path)
+        train_df,eval_df=train_test_split(df,test_size=0.2,random_state=42)
+        model=self.train(train_df,eval_df)
+        self.save_model(model,self.tokenizer,output_dir)

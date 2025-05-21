@@ -27,8 +27,8 @@ class FacebookAPI:
     
 
     @cached(cache=TTLCache(maxsize=100, ttl=3600))
-    def get_posts(self,pade_id:str)-> List[Dict[str,Any]]:
-        cache_key=self._get_cache_key(f"posts_{pade_id}",{})
+    def get_posts(self,page_id:str)-> List[Dict[str,Any]]:
+        cache_key=self._get_cache_key(f"posts_{page_id}",{})
         cache_file=self.cache_dir/ f"{cache_key}.json"
 
 
@@ -54,7 +54,7 @@ class FacebookAPI:
             self.memory_cache[cache_key]=data
             return data
         except  Exception as e:
-            logger.error(f"facebook api error: {stre(e)}")
+            logger.error(f"facebook api error: {str(e)}")
 
             raise 
 

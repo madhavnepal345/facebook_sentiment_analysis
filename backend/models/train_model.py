@@ -2,8 +2,9 @@ from transformers import BertTokenizer,BertForSequenceClassification
 from transformers import Trainer,TrainingArguments
 import torch
 from torch.utils.data import Dataset
-import numpy as np
+import pandas as pd
 from sklearn.metrics import accuracy_socre,precision_recall_fscore_support
+from sklearn.model_selection import train_test_split
 
 
 class SentimentDataset(Dataset):
@@ -39,7 +40,7 @@ class BERTModelTrainer:
         self.label_map={'negative':0,'neutral':1,'positive':2}
         self.reverse_label_map={v:k for k,v in self.label_map.items()}
     
-    def load_data(self,data_path:str):
+    def load_data(self,filepath:str):
         # loading the data
         df=pd.read_csv(filepath)
         df['cleaned_text']=df['text'].apply(self.preprocess_text)
@@ -51,9 +52,9 @@ class BERTModelTrainer:
 
     def compute_metrics(self,pred):
         labels=pred.label_ids
-        preds-pred.predicitions.argmax(-1)
-        precision,recall,f1,_= precision_recall_fscore_support(labels,preds,average='weighted')
-        acc=accuracy_score(labels,preds)
+        pred-pred.predicitions.argmax(-1)
+        precision,recall,f1,_= precision_recall_fscore_support(labels,pred,average='weighted')
+        acc=accuracy_socre(labels,pred)
         return{
             'accuracy':acc,
             'f1':f1,
@@ -99,10 +100,10 @@ class BERTModelTrainer:
 
         # Initialize Trainer
 
-        Trainer=Trainer(
+        trainer=Trainer(
             model=model,
             args=training_args,
-            train_dataset=train_dataset,
+            train_dataset=train_datasets,
             eval_dataset=eval_dataset,
             compute_metrics=self.compute_metrics
         )
@@ -110,7 +111,7 @@ class BERTModelTrainer:
         # Train the model
         trainer.train()
         return model
-    def save_model(self,model,tokenizer,outpuy_dir):
+    def save_model(self,model,tokenizer,output_dir):
         model.save_pretrained(output_dir)
         tokenizer.save_pretrained(output_dir)
 

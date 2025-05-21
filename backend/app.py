@@ -1,14 +1,15 @@
 from fastapi import FastAPI, Depends, HTTPException,Request
+from fastapi import status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
+from slowapi.errors import RateLimitExceeded,_rate_limit_exceeded_handler
 from prometheus_fastapi_instrumentator import Instrumentator
 import joblib
 import pandas as pd
-from typing import List, Dict, Any
-from datetime import datetime
+from typing import  Dict, Any
+from datetime import timedelta
 
 
 from utils.facebook_api import FacebookAPI
@@ -22,6 +23,8 @@ from utils.auth import(
 )
 
 app = FastAPI()
+
+
 limiter =Limiter(key_func=get_remote_address)
 app.state.limiter=limiter
 app.add_exception_handler(RateLimitExceeded,_rate_limit_exceeded_handler)
@@ -96,6 +99,6 @@ async def analyze_comments(
             status_code=500,
             detail=f"Error processing request: {str(e)}"
         )
-@app.get("health")
+@app.get("/health")
 async def health_check():
     return {"status": "healthy"}
